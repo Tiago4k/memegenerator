@@ -1,24 +1,41 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from "react";
+import { Meme } from "./components/Meme";
 
 function App() {
+  const [templates, setTemplates] = useState([]);
+  const [template, setTemplate] = useState(null);
+
+  useEffect(() => {
+    fetch("https://api.imgflip.com/get_memes").then(x =>
+      x.json().then(response => setTemplates(response.data.memes))
+    );
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div style={{ textAlign: "center" }}>
+      {template && (
+        <form>
+          <Meme template={template} />
+          <input placeholder="top text" />
+          <input placeholder="bottom text" />
+          <button type="submit">Create Meme</button>
+        </form>
+      )}
+      {!template && (
+        <>
+          <h1>Pick a template</h1>
+          {templates.map(template => {
+            return (
+              <Meme
+                template={template}
+                onClick={() => {
+                  setTemplate(template);
+                }}
+              />
+            );
+          })}
+        </>
+      )}
     </div>
   );
 }
